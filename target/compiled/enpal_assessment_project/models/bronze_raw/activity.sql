@@ -5,4 +5,4 @@ SELECT
     A.deal_id, 
     A.done, 
     A.due_to 
-FROM POSTGRES.PUBLIC.ACTIVITY A
+FROM "postgres"."public"."activity" A

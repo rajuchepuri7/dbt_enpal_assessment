@@ -5,4 +5,4 @@ SELECT
     U.name, 
     U.email, 
     U.modified 
-FROM POSTGRES.PUBLIC.USERS U 
+FROM {{ source('postgres_public', 'users') }} U 

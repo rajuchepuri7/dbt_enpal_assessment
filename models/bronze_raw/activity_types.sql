@@ -5,4 +5,4 @@ SELECT
     AP.name, 
     AP.active, 
     AP.type
-FROM POSTGRES.PUBLIC.ACTIVITY_TYPES AP 
+FROM {{ source('postgres_public', 'activity_types') }} AP 

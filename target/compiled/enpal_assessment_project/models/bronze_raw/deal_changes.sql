@@ -6,4 +6,4 @@ SELECT
     DC.change_time, 
     DC.changed_field_key, 
     DC.new_value 
-FROM POSTGRES.PUBLIC.DEAL_CHANGES DC
+FROM "postgres"."public"."deal_changes"DC

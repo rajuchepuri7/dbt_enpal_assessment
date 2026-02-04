@@ -7,4 +7,4 @@ SELECT
     A.deal_id, 
     A.done, 
     A.due_to 
-FROM POSTGRES.PUBLIC.ACTIVITY A 
+FROM {{ source('postgres_public', 'activity') }} A 

@@ -3,4 +3,4 @@ SELECT
     AP.name, 
     AP.active, 
     AP.type
-FROM POSTGRES.PUBLIC.ACTIVITY_TYPES AP
+FROM "postgres"."public"."activity_types" AP
