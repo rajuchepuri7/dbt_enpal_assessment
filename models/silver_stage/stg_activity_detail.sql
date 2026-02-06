@@ -17,17 +17,21 @@ SELECT
     AT.name AS activity_name,  
     CASE 
 	    A.type 
-    	WHEN 'meeting' THEN 'Qualified lead' 
-    	WHEN 'sc_2' THEN 'Needs Assessment' 
+    	WHEN 'meeting' THEN 'Sales Call 1' 
+    	WHEN 'sc_2' THEN 'Sales Call 2' 
     	WHEN 'follow_up' THEN 'Follow-up/Customer Success' 
     	WHEN 'after_close_call' THEN 'Closing'
     END AS stage_name,  
+    U.name AS user_name, 
+    U.email AS user_email, 
     DATE_PART('YEAR', due_to) AS year, 
     DATE_PART('MONTH', due_to) AS month,  
     ROW_NUMBER() OVER(PARTITION BY A.activity_id ORDER BY A.done DESC, A.due_to) AS ranking
 FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.ACTIVITY A
 LEFT JOIN POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.ACTIVITY_TYPES AT 
-    ON AT.type = A.type
+    ON AT.type = A.type 
+LEFT JOIN POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.USERS U 
+    ON U.id = A.assigned_to_user 
 ) 
 SELECT 
     AB.activity_id, 
@@ -39,6 +43,8 @@ SELECT
     AB.activity_type_id, 
     AB.activity_name,  
     AB.stage_name, 
+    AB.user_name, 
+    AB.user_email, 
     AB.year, 
     AB.month  
 FROM ACTIVITY_BASE AB 
