@@ -1,0 +1,66 @@
+
+
+version: 2
+
+models:
+  - name: raw_activity 
+    description: This table contains the activities of a deal owned by the user/owner and their due time
+    columns: 
+      - name: activity_id
+        description: identifier of an activity associated with a deal 
+      - name: type 
+        description: type / category of the activity performed / due by the user for the deal
+      - name: assigned_to_user 
+        description: The User ID of the person responsible for completing the activity
+      - name: deal_id 
+        description: The unique identifier of the deal linked to this activity  
+        tests: 
+          - not null 
+      - name: done 
+        description: Boolean flag or status indicating if the activity is completed (True) or still pending (False)
+      - name: due_to 
+        description: The scheduled deadline or completion timestamp for the activity
+
+  - name: raw_deal_changes
+    description: Audit log containing a record of every change made to a deal's attributes over time
+    columns:
+      - name: deal_id 
+        description: The unique identifier of the deal being modified 
+        tests: 
+          - not null 
+      - name: change_time 
+        description: The exact / actual timestamp when the change was recorded
+      - name: changed_field_key 
+        description: The specific field or attribute that was updated (e.g., 'stage_id', 'user_id', 'add_time', 'lost_reason')
+      - name: new_value 
+        description: The updated / new value of the field after the change occurred 
+
+  - name: raw_activity_type
+    description: contains differnt unique activity type setails  
+    columns:
+      - name: id 
+        description: unique identifier of an activity type 
+      - name: name
+        description: actual name for the actiivty type 
+      - name: active
+        description: specifies whether activity is active or Inactive 
+        tests: 
+          - accepted_values:
+              values: ['Yes', 'No']
+      - name: type 
+        description: type of the activity with short name or substitued name  
+
+  - name: raw_users
+    description: Registry of users within the CRM system who can be assigned as owners of deals or activities
+    columns:
+      - name: id
+        description: Primary key. Unique identifier for the user 
+        tests: 
+          - unique 
+          - not null 
+      - name: name 
+        description: The full name of the user
+      - name: email 
+        description: The primary email address of the user / owner, which can be used for notification
+      - name: modified
+        description: The timestamp of the most recent update to the user's profile or record

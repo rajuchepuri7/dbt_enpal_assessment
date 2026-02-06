@@ -10,6 +10,15 @@ WHERE deal_id NOT IN (SELECT
                       FROM POSTGRES.PUBLIC_ENPAL_CRM_ANALYTICS.RAW_DEAL_CHANGES
                      ) --- AND done = FALSE 
 
+/**
+SELECT 
+    *  
+FROM POSTGRES.PUBLIC_ENPAL_CRM_ANALYTICS.RAW_DEAL_CHANGES
+WHERE deal_id NOT IN (SELECT 
+                          DISTINCT deal_id 
+                      FROM POSTGRES.PUBLIC_ENPAL_CRM_ANALYTICS.RAW_ACTIVITY 
+                     )
+**/ 
 
 --- SELECT * FROM ACTIVITY WHERE deal_id = 149371; 
 
