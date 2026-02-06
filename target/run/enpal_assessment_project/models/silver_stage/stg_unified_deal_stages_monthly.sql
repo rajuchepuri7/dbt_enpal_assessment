@@ -66,7 +66,7 @@ SELECT
     FB1.funnel_step, 
     FB1.stage_name 
 FROM FINAL_BASE_1 FB1
-WHERE ranking = 1
+WHERE ranking = 1  -- eliminate the double count of a deal with more than one stge change in a month
 
 UNION 
 
