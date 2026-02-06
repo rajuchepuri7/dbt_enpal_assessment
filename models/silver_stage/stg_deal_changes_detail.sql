@@ -12,8 +12,7 @@ SELECT
     COUNT(CASE WHEN DC.changed_field_key = 'user_id' THEN 1 END) OVER (PARTITION BY DC.deal_id ORDER BY DC.change_time) AS user_group, 
     --- Group for combined status (stage_id OR lost_reason)
     COUNT(CASE WHEN DC.changed_field_key IN ('stage_id', 'lost_reason') THEN 1 END) OVER (PARTITION BY DC.deal_id ORDER BY DC.change_time) as status_group 
-FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.DEAL_CHANGES DC 
-WHERE deal_id = 399956
+FROM {{ ref('deal_changes') }} DC 
 ), 
 DEAL_CHANGES_BASE_TRANSFORM AS (
 SELECT 
@@ -42,15 +41,17 @@ SELECT
     BT.deal_status_value, 
     U.name AS user_name, 
     U.email AS user_email, 
-    S.stage_name
+    S.stage_name, 
+    CAST(DATE_PART('YEAR', BT.change_time) AS INT) AS change_year, 
+    CAST(DATE_PART('MONTH', BT.change_time) AS INT) AS change_month 
 FROM DEAL_CHANGES_BASE_TRANSFORM BT
-LEFT JOIN POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.USERS U 
+LEFT JOIN {{ ref('users') }} U 
     ON U.id = BT.user_id 
-LEFT JOIN (SELECT 'stage_id' AS status_type, stage_id, stage_name FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STAGES
+LEFT JOIN (SELECT 'stage_id' AS status_type, stage_id, stage_name FROM {{ ref('stages') }}
            
            UNION 
            
-           SELECT 'lost_reason' AS status_type, reason_id, reason_label FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STG_LOST_REASONS 
+           SELECT 'lost_reason' AS status_type, reason_id, reason_label FROM {{ ref('stg_lost_reasons') }} 
           ) S 
     ON S.status_type = COALESCE(BT.deal_status_type, 'XXXX') 
     AND S.stage_id = COALESCE(BT.deal_status_value, 0) 
