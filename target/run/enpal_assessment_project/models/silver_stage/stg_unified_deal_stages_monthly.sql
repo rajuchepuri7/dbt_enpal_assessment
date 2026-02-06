@@ -9,7 +9,7 @@
   
   (
     --- There are very minimal number of deals (less than 10) that are common between ACTIVITY & DEAL_CHANGES source tables 
---- Ignoring them for now from the calculation, as therei isn't a clear path on how to handle them  
+--- Ignoring them for now from the calculation, as there isn't a clear path on how to handle them  
 --- deals from DEAL_CHANGES that are not in ACTIVITY 
 WITH FINAL_BASE_1 AS (
 SELECT 
@@ -77,6 +77,7 @@ SELECT
     FB2.deal_id, 
     FB2.funnel_step, 
     FB2.stage_name 
-FROM FINAL_BASE_2 FB2
+FROM FINAL_BASE_2 FB2  
+WHERE ranking = 1
   );
   
