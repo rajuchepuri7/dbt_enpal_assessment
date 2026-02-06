@@ -20,9 +20,9 @@ SELECT
     DCD.change_month, 
     CONCAT('Step ', DCD.deal_status_value, ': ') AS funnel_step, 
     ROW_NUMBER() OVER (PARTITION BY DCD.deal_id, DCD.change_year, DCD.change_month ORDER BY DCD.deal_status_value DESC) AS ranking 
-FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STG_DEAL_CHANGES_DETAIL DCD
+FROM {{ ref('stg_deal_changes_detail') }} DCD
 WHERE DCD.changed_field_key = 'stage_id' 
-    AND DCD.deal_id NOT IN (SELECT deal_id FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STG_ACTIVITY_DETAIL GROUP BY deal_id) 
+    AND DCD.deal_id NOT IN (SELECT deal_id FROM {{ ref('stg_activity_detail') }} GROUP BY deal_id) 
 ), 
 --- deals from ACTIVITY that are not in DEAL_CHANGES 
 FINAL_BASE_2 AS (
@@ -47,8 +47,8 @@ SELECT
     	WHEN AD.activity_type_id = 4 THEN 'Step 6: '
     END AS funnel_step, 
     ROW_NUMBER() OVER(PARTITION BY AD.deal_id, AD.year, AD.month ORDER BY AD.activity_type_id DESC) AS ranking 
-FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STG_ACTIVITY_DETAIL AD 
-WHERE AD.deal_id NOT IN (SELECT deal_id FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STG_DEAL_CHANGES_DETAIL GROUP BY deal_id)
+FROM {{ ref('stg_activity_detail') }} AD 
+WHERE AD.deal_id NOT IN (SELECT deal_id FROM {{ ref('stg_deal_changes_detail') }} GROUP BY deal_id)
 )
 SELECT 
     FB1.change_year, 
@@ -58,7 +58,7 @@ SELECT
     FB1.funnel_step, 
     FB1.stage_name 
 FROM FINAL_BASE_1 FB1
-WHERE ranking = 1
+WHERE ranking = 1  -- eliminate the double count of a deal with more than one stge change in a month
 
 UNION 
 

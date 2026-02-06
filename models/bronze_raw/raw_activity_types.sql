@@ -1,5 +1,5 @@
 
-
+--- activity_types raw data load into bronze layer
 SELECT 
     AP.id, 
     AP.name, 

@@ -2,13 +2,14 @@
   
     
 
-  create  table "postgres"."public_pipedrive_analytics"."stg_deal_changes_detail__dbt_tmp"
+  create  table "postgres"."public_enpal_crm_analytics"."stg_deal_changes_detail__dbt_tmp"
   
   
     as
   
   (
-    WITH DEAL_CHANGES_BASE AS (
+    --- enrich the records in deal_changes with relevant deatils from other tables 
+WITH DEAL_CHANGES_BASE AS (
 SELECT 
     DC.deal_id, 
     DC.change_time, 
@@ -20,7 +21,7 @@ SELECT
     COUNT(CASE WHEN DC.changed_field_key = 'user_id' THEN 1 END) OVER (PARTITION BY DC.deal_id ORDER BY DC.change_time) AS user_group, 
     --- Group for combined status (stage_id OR lost_reason)
     COUNT(CASE WHEN DC.changed_field_key IN ('stage_id', 'lost_reason') THEN 1 END) OVER (PARTITION BY DC.deal_id ORDER BY DC.change_time) as status_group 
-FROM "postgres"."public_pipedrive_analytics"."deal_changes" DC 
+FROM "postgres"."public_enpal_crm_analytics"."raw_deal_changes" DC 
 ), 
 DEAL_CHANGES_BASE_TRANSFORM AS (
 SELECT 
@@ -53,13 +54,13 @@ SELECT
     CAST(DATE_PART('YEAR', BT.change_time) AS INT) AS change_year, 
     CAST(DATE_PART('MONTH', BT.change_time) AS INT) AS change_month 
 FROM DEAL_CHANGES_BASE_TRANSFORM BT
-LEFT JOIN "postgres"."public_pipedrive_analytics"."users" U 
+LEFT JOIN "postgres"."public_enpal_crm_analytics"."raw_users" U 
     ON U.id = BT.user_id 
-LEFT JOIN (SELECT 'stage_id' AS status_type, stage_id, stage_name FROM "postgres"."public_pipedrive_analytics"."stages"
+LEFT JOIN (SELECT 'stage_id' AS status_type, stage_id, stage_name FROM "postgres"."public_enpal_crm_analytics"."raw_stages" 
            
            UNION 
            
-           SELECT 'lost_reason' AS status_type, reason_id, reason_label FROM "postgres"."public_pipedrive_analytics"."stg_lost_reasons" 
+           SELECT 'lost_reason' AS status_type, reason_id, reason_label FROM "postgres"."public_enpal_crm_analytics"."stg_lost_reasons" 
           ) S 
     ON S.status_type = COALESCE(BT.deal_status_type, 'XXXX') 
     AND S.stage_id = COALESCE(BT.deal_status_value, 0) 

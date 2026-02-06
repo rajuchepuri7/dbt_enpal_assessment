@@ -1,5 +1,5 @@
 
-
+--- enrich the records in deal_changes with relevant deatils from other tables 
 WITH DEAL_CHANGES_BASE AS (
 SELECT 
     DC.deal_id, 
@@ -12,7 +12,7 @@ SELECT
     COUNT(CASE WHEN DC.changed_field_key = 'user_id' THEN 1 END) OVER (PARTITION BY DC.deal_id ORDER BY DC.change_time) AS user_group, 
     --- Group for combined status (stage_id OR lost_reason)
     COUNT(CASE WHEN DC.changed_field_key IN ('stage_id', 'lost_reason') THEN 1 END) OVER (PARTITION BY DC.deal_id ORDER BY DC.change_time) as status_group 
-FROM {{ ref('deal_changes') }} DC 
+FROM {{ ref('raw_deal_changes') }} DC 
 ), 
 DEAL_CHANGES_BASE_TRANSFORM AS (
 SELECT 
@@ -45,9 +45,9 @@ SELECT
     CAST(DATE_PART('YEAR', BT.change_time) AS INT) AS change_year, 
     CAST(DATE_PART('MONTH', BT.change_time) AS INT) AS change_month 
 FROM DEAL_CHANGES_BASE_TRANSFORM BT
-LEFT JOIN {{ ref('users') }} U 
+LEFT JOIN {{ ref('raw_users') }} U 
     ON U.id = BT.user_id 
-LEFT JOIN (SELECT 'stage_id' AS status_type, stage_id, stage_name FROM {{ ref('stages') }}
+LEFT JOIN (SELECT 'stage_id' AS status_type, stage_id, stage_name FROM {{ ref('raw_stages') }} 
            
            UNION 
            

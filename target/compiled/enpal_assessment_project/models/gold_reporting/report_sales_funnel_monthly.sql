@@ -4,7 +4,7 @@ SELECT
     UDS.funnel_step, 
     UDS.stage_name AS kpi_name, 
     COUNT(UDS.deal_id) AS deals_count
-FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.STG_UNIFIED_DEAL_STAGES_MONTHLY UDS
+FROM "postgres"."public_enpal_crm_analytics"."stg_unified_deal_stages_monthly" UDS
 GROUP BY 
     UDS.year_month, 
     UDS.funnel_step, 

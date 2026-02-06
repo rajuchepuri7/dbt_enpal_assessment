@@ -26,10 +26,10 @@ SELECT
     DATE_PART('YEAR', due_to) AS year, 
     DATE_PART('MONTH', due_to) AS month,  
     ROW_NUMBER() OVER(PARTITION BY A.activity_id ORDER BY A.done DESC, A.due_to) AS ranking
-FROM POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.ACTIVITY A
-LEFT JOIN POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.ACTIVITY_TYPES AT 
+FROM "postgres"."public_enpal_crm_analytics"."raw_activity" A
+LEFT JOIN "postgres"."public_enpal_crm_analytics"."raw_activity_types" AT 
     ON AT.type = A.type 
-LEFT JOIN POSTGRES.PUBLIC_PIPEDRIVE_ANALYTICS.USERS U 
+LEFT JOIN "postgres"."public_enpal_crm_analytics"."raw_users" U 
     ON U.id = A.assigned_to_user 
 ) 
 SELECT 
