@@ -1,0 +1,10 @@
+
+
+SELECT 
+    A.activity_id, 
+    A.type,  
+    A.assigned_to_user, 
+    A.deal_id, 
+    A.done, 
+    A.due_to 
+FROM {{ source('postgres_public', 'activity') }} A 
